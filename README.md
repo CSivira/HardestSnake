@@ -1,2 +1,2 @@
 # HardestSnake
-Remake of Snake
+Snake Remake
