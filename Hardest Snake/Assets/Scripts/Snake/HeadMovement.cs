@@ -4,74 +4,99 @@ using UnityEngine;
 
 public class HeadMovement : MonoBehaviour {
 
+	public float _speed;
+	public float frameRate;
+	public float rotationSensitivity;
 	public List<Transform> tail = new List<Transform>();
+	public List<GameObject> points = new List<GameObject>();
+	public GameObject tailPrefab;
+	public GameObject pointPrefab;
+	public GameObject fruitManager;
 
-	public GameObject TailPrefab;
-
-	private float _speed=0.99f;
-
-	private GameObject[] fruit;
-
-	private GameObject target_fruit;
-
-	private float distance;
-
-	private bool orientation;
-
+	private float orientation;
+	private Transform spawn;
+	private float speed;
+	private int snakeZise;
 	private float rotation;
+	private int pointIndex;
+	private int tailIndex;
 
-	private Vector3 lastpos;
+	void Start() {
+		InvokeRepeating("SetRoad",0f,frameRate);
+		speed = _speed;
+		spawn = transform.GetChild (1);
+	}
+		
+	void FixedUpdate () {
+		Rotation ();
+		if (GameManager.GameState.menu == GameManager.gameState || GameManager.GameState.dead == GameManager.gameState) {
+			_speed = 0f;
+		} else {
+			_speed = speed;
+		}
 
-//	private float frameRate = 0.1f;
+		if (transform.position.x > 4.7f || transform.position.x < -4.7f || transform.position.y > 4.7f || transform.position.y < -4.7f) {
+			GameManager.gameState = GameManager.GameState.dead;
+		}
 
-//	private float step = 1f;
+		if (Input.GetKey (KeyCode.M)) {
+			orientation = 1f;
+		}
 
-//	void Start() {
-//		InvokeRepeating("Move",frameRate,frameRate);
-//	}
+		if (Input.GetKey (KeyCode.Z)) {
+			orientation = -1f;
+		}
 
-	void Move(){
-		lastpos = transform.position;
+		if (!Input.GetKey (KeyCode.Z) && !Input.GetKey (KeyCode.M)){
+			orientation = 0f;
+		}
 
-		if (orientation) {
-			rotation = 1;
-		} else{
-			rotation = -1;
+		if (points.Count > tail.Count) {
+			DestroyRoad ();
+		}
+	}
+
+	void Rotation(){
+
+		if (orientation == 1f) {
+			rotation = -1f * rotationSensitivity;
+		}
+
+		if (orientation == -1f) {
+			rotation = 1f * rotationSensitivity;
 		}
 
 		transform.rotation = Quaternion.Euler(0f,0f,rotation) * transform.rotation ;
-		transform.position = Vector3.MoveTowards(transform.position,transform.GetChild(0).transform.position,Time.deltaTime);
-//		transform.position *= step;
-		MoveTail();
+		transform.position = Vector3.MoveTowards(transform.position,transform.GetChild(0).transform.position,_speed * Time.deltaTime);
 	}
-	
-	void MoveTail(){
-		for (int i = 0; i < tail.Count; i++) {
-			Vector3 temp = tail [i].position;
-			tail [i].position = Vector3.MoveTowards(tail[i].position,lastpos,(_speed-(0.01f*i))*Time.deltaTime);
-			lastpos = temp;
+
+	void SetRoad() {
+		if (tail.Count != 0) {
+			GameObject newPoint = (GameObject)Instantiate (pointPrefab,spawn.position,transform.rotation);
+			points.Add (newPoint);
 		}
 	}
-	// Update is called once per frame
-	void FixedUpdate () {
-		fruit = GameObject.FindGameObjectsWithTag("Fruit");
-		if (Input.GetKey (KeyCode.Z)) {
-			orientation = false;
-		} else if (Input.GetKey (KeyCode.M)) {
-			orientation = true;
-			}
-		target_fruit = fruit[0];
-		distance = Vector3.Distance(transform.position,target_fruit.transform.position);
-		Move ();
+
+	void DestroyRoad() {
+		Destroy (points[0]);
+		points.Remove (points[0]);
+	}
+
+	void AddBody() {
+		GameObject newTail = (GameObject)Instantiate (tailPrefab, spawn.position, Quaternion.identity);
+		tail.Add (newTail.transform);
 	}
 
 	void OnTriggerEnter2D(Collider2D col){
-		if (col.CompareTag("Block")){
-			print ("Has Perdido");
+		if (col.gameObject.tag == "Block"){
+			GameManager.gameState = GameManager.GameState.dead;
+
 		}
-		else if (distance <= 0.1f){
-			tail.Add(Instantiate(TailPrefab,tail[tail.Count-1].position,Quaternion.identity).transform);
-			//col.transform.position = new Vector2 (Random.Range(horizontalRange.x,horizontalRange.y),Random.Range(verticalRange.x,verticalRange.y));
+
+		if (col.gameObject.tag == "Fruit"){
+			AddBody ();
+			fruitManager.SendMessage("ChangePosition");
+			GameManager.points++;
 		}
 	}
 }

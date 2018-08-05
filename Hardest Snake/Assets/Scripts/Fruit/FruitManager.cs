@@ -13,19 +13,13 @@ public class FruitManager : MonoBehaviour {
 		Instantiate (fruitPrefab, initialFruit, Quaternion.identity);
 	}
 
-	void Update () {
+	void ChangePosition() {
 		fruitCount = GameObject.FindGameObjectsWithTag ("Fruit").Length;
 		actualFruits = GameObject.FindGameObjectsWithTag ("Fruit");
-
-		if (fruitCount == 0) {
-			CreateNewFruit ();
+		for (int i = 0; i < fruitCount; i++) {
+			Destroy (actualFruits[i]);
 		}
-
-		if (Input.GetKeyDown (KeyCode.Return)) {
-			for (int i = 0; i < fruitCount; i++) {
-				Destroy (actualFruits[i]);
-			}
-		}
+		CreateNewFruit ();
 	}
 
 	void CreateNewFruit() {

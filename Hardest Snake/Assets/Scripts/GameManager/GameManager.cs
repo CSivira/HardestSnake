@@ -4,23 +4,25 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour {
 
-	public enum GameState {menu, playing, dead}
+	public enum GameState {menu, playing, lose,dead}
 
 	public GameObject menu;
 	public GameObject deadMenu;
 	public GameObject fruitManager;
+	public GameObject snake;
 	public Text actualScore;
 	public Text bestScore;
+	public static GameState gameState = GameState.menu;
+	public static int points;
 
 	private bool usserAction;
-	private GameState gameState = GameState.menu;
-	private int points;
 	private int bestPoints;
 
 	void Start () {
 		menu.SetActive (true);
 		deadMenu.SetActive (false);
 		fruitManager.SetActive (false);
+		snake.SetActive (true);
 	}
 
 	void Update () {
@@ -29,25 +31,33 @@ public class GameManager : MonoBehaviour {
 		if (gameState == GameState.menu) {
 			if (usserAction) {
 				menu.SetActive (false);
+				deadMenu.SetActive (false);
 				gameState = GameState.playing;
 				fruitManager.SetActive (true);
+				snake.SetActive (true);
 			}
 		}
 
-		if (Input.GetKeyDown (KeyCode.UpArrow)) {
-			IngreasePoints ();
-		}
-
-		if (Input.GetKeyDown (KeyCode.Space) && gameState == GameState.playing) {
-			gameState = GameState.dead;
-			deadMenu.SetActive (true);
-			fruitManager.SetActive (false);
+		if (gameState == GameState.playing) {
+			deadMenu.SetActive (false);
+			fruitManager.SetActive (true);
+			snake.SetActive (true);
 		}
 
 		if (gameState == GameState.dead) {
+			actualScore.text = points.ToString ();
+			Dead ();
 			if (usserAction) {
-				RestartScene ();
+				deadMenu.SetActive (false);
+				//RestartScene ();
+				menu.SetActive (true);
+				snake.SetActive (true);
+				snake.transform.position = new Vector3 (0f,-1f,0f);
 			}
+		}
+
+		if (bestPoints < points) {
+			SetBestScore ();
 		}
 	}
 
@@ -55,13 +65,8 @@ public class GameManager : MonoBehaviour {
 		SceneManager.LoadScene ("MainScene");
 	}
 
-	void IngreasePoints() {
-		points++;
-		actualScore.text = points.ToString ();
-
-		if (bestPoints < points) {
-			SetBestScore ();
-		}
+	void Dead() {
+		deadMenu.SetActive (true);
 	}
 
 	void SetBestScore() {
