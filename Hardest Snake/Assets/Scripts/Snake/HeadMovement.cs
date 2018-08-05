@@ -12,7 +12,6 @@ public class HeadMovement : MonoBehaviour {
 	public GameObject tailPrefab;
 	public GameObject pointPrefab;
 	public GameObject fruitManager;
-	public GameObject deadMenu;
 
 	private float orientation;
 	private Transform spawn;
@@ -96,7 +95,6 @@ public class HeadMovement : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D col){
 		if (col.gameObject.tag == "Block"){
 			GameManager.gameState = GameState.dead;
-			deadMenu.SetActive (true);
 		}
 
 		if (col.gameObject.tag == "Fruit"){
