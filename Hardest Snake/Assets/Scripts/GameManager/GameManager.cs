@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviour {
 	public Text bestScore;
 	public static GameState gameState = GameState.menu;
 	public static int points;
+	public AudioClip[] clips;
+	private AudioSource player;
 
 	private bool usserAction;
 	private int bestPoints;
@@ -26,16 +28,16 @@ public class GameManager : MonoBehaviour {
 		deadMenu.SetActive (false);
 		fruitManager.SetActive (false);
 		snake.SetActive (true);
+		player = GetComponent<AudioSource>();
 	}
 
 	void Update () {
 		usserAction = Input.GetKeyDown (KeyCode.Return);
 
 		if (points > actualPoints) {
-			//Aqui se verifica si se incrementaron los puntos
-			//Por lo tanto acabamos de comer una fruta
-			//Pon aqui el sonido de comer fruta
 			actualPoints = points;
+			player.clip = clips[2];
+			player.Play();
 		}
 
 		if (gameState == GameState.menu) {
@@ -46,18 +48,24 @@ public class GameManager : MonoBehaviour {
 				fruitManager.SetActive (false);
 				snake.SetActive (true);
 			}
+			player.clip = clips[0];
+			player.Play();
 		}
 
 		if (gameState == GameState.playing) {
 			deadMenu.SetActive (false);
 			fruitManager.SetActive (true);
 			snake.SetActive (true);
+			player.clip = clips[1];
+			player.Play();
 		}
 
 		if (gameState == GameState.dead) {
 			actualScore.text = points.ToString ();
 			fruitManager.SetActive (false);
 			deadMenu.SetActive (true);
+			player.clip = clips[3];
+			player.Play();
 			if (usserAction) {
 				gameState = GameState.menu;
 				SceneManager.LoadScene ("MainScene");

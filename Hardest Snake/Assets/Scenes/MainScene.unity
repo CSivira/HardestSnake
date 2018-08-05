@@ -748,6 +748,11 @@ MonoBehaviour:
   snake: {fileID: 282790702}
   actualScore: {fileID: 392507583}
   bestScore: {fileID: 0}
+  clips:
+  - {fileID: 8300000, guid: 761138ae7674c72409ac2aa5591b052c, type: 3}
+  - {fileID: 8300000, guid: 1552d973825e90a4b8b97c5549cd2cf6, type: 3}
+  - {fileID: 8300000, guid: 5443eb0a6f363e84791bd418b183b507, type: 3}
+  - {fileID: 8300000, guid: 82f0b8fd159bb364986d462e9dccb7a8, type: 3}
 --- !u!4 &1110888951
 Transform:
   m_ObjectHideFlags: 0
