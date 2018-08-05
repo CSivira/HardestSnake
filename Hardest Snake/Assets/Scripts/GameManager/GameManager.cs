@@ -10,12 +10,16 @@ public class GameManager : MonoBehaviour {
 	public GameObject deadMenu;
 	public GameObject fruitManager;
 	public GameObject snake;
+
+	public GameObject MenuSound;
+	public GameObject InGameSound;
+	public GameObject FruitSound;
+	public GameObject DeadSound;
+
 	public Text actualScore;
 	public Text bestScore;
 	public static GameState gameState = GameState.menu;
 	public static int points;
-	public AudioClip[] clips;
-	private AudioSource player;
 
 	private bool usserAction;
 	private int bestPoints;
@@ -28,7 +32,10 @@ public class GameManager : MonoBehaviour {
 		deadMenu.SetActive (false);
 		fruitManager.SetActive (false);
 		snake.SetActive (true);
-		player = GetComponent<AudioSource>();
+	}
+
+	void Desactivate() {
+		FruitSound.SetActive(false);
 	}
 
 	void Update () {
@@ -36,8 +43,8 @@ public class GameManager : MonoBehaviour {
 
 		if (points > actualPoints) {
 			actualPoints = points;
-			player.clip = clips[2];
-			player.Play();
+			FruitSound.SetActive(true);
+			Invoke ("Desactivate", 15f*Time.deltaTime);
 		}
 
 		if (gameState == GameState.menu) {
@@ -47,25 +54,28 @@ public class GameManager : MonoBehaviour {
 				gameState = GameState.playing;
 				fruitManager.SetActive (false);
 				snake.SetActive (true);
+				DeadSound.SetActive(false);
+				MenuSound.SetActive(true);
 			}
-			player.clip = clips[0];
-			player.Play();
 		}
 
 		if (gameState == GameState.playing) {
 			deadMenu.SetActive (false);
 			fruitManager.SetActive (true);
 			snake.SetActive (true);
-			player.clip = clips[1];
-			player.Play();
+			MenuSound.SetActive(false);
+			InGameSound.SetActive(true);
+
 		}
 
 		if (gameState == GameState.dead) {
 			actualScore.text = points.ToString ();
 			fruitManager.SetActive (false);
 			deadMenu.SetActive (true);
-			player.clip = clips[3];
-			player.Play();
+			InGameSound.SetActive(false);
+			DeadSound.SetActive(true);
+
+
 			if (usserAction) {
 				gameState = GameState.menu;
 				SceneManager.LoadScene ("MainScene");
