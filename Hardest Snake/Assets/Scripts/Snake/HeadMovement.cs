@@ -12,6 +12,7 @@ public class HeadMovement : MonoBehaviour {
 	public GameObject tailPrefab;
 	public GameObject pointPrefab;
 	public GameObject fruitManager;
+	public GameObject deadMenu;
 
 	private float orientation;
 	private Transform spawn;
@@ -29,14 +30,19 @@ public class HeadMovement : MonoBehaviour {
 		
 	void FixedUpdate () {
 		Rotation ();
-		if (GameManager.GameState.menu == GameManager.gameState || GameManager.GameState.dead == GameManager.gameState) {
+		if (GameState.menu == GameManager.gameState) {
 			_speed = 0f;
 		} else {
 			_speed = speed;
 		}
 
+		if (GameState.dead == GameManager.gameState) {
+			_speed = 0f;
+			transform.position = Vector3.MoveTowards (transform.position, Vector3.zero, speed * Time.deltaTime);
+		}
+
 		if (transform.position.x > 4.7f || transform.position.x < -4.7f || transform.position.y > 4.7f || transform.position.y < -4.7f) {
-			GameManager.gameState = GameManager.GameState.dead;
+			GameManager.gameState = GameState.dead;
 		}
 
 		if (Input.GetKey (KeyCode.M)) {
@@ -89,8 +95,8 @@ public class HeadMovement : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D col){
 		if (col.gameObject.tag == "Block"){
-			GameManager.gameState = GameManager.GameState.dead;
-
+			GameManager.gameState = GameState.dead;
+			deadMenu.SetActive (true);
 		}
 
 		if (col.gameObject.tag == "Fruit"){

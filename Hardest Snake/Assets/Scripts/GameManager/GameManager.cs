@@ -2,9 +2,9 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour {
+public enum GameState {menu, playing, lose,dead}
 
-	public enum GameState {menu, playing, lose,dead}
+public class GameManager : MonoBehaviour {
 
 	public GameObject menu;
 	public GameObject deadMenu;
@@ -17,8 +17,11 @@ public class GameManager : MonoBehaviour {
 
 	private bool usserAction;
 	private int bestPoints;
+	private int actualPoints;
 
 	void Start () {
+		points = 0;
+		actualPoints = points;
 		menu.SetActive (true);
 		deadMenu.SetActive (false);
 		fruitManager.SetActive (false);
@@ -28,12 +31,19 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		usserAction = Input.GetKeyDown (KeyCode.Return);
 
+		if (points > actualPoints) {
+			//Aqui se verifica si se incrementaron los puntos
+			//Por lo tanto acabamos de comer una fruta
+			//Pon aqui el sonido de comer fruta
+			actualPoints = points;
+		}
+
 		if (gameState == GameState.menu) {
+			deadMenu.SetActive (false);
 			if (usserAction) {
 				menu.SetActive (false);
-				deadMenu.SetActive (false);
 				gameState = GameState.playing;
-				fruitManager.SetActive (true);
+				fruitManager.SetActive (false);
 				snake.SetActive (true);
 			}
 		}
@@ -46,31 +56,12 @@ public class GameManager : MonoBehaviour {
 
 		if (gameState == GameState.dead) {
 			actualScore.text = points.ToString ();
-			Dead ();
+			fruitManager.SetActive (false);
+			deadMenu.SetActive (true);
 			if (usserAction) {
-				deadMenu.SetActive (false);
-				//RestartScene ();
-				menu.SetActive (true);
-				snake.SetActive (true);
-				snake.transform.position = new Vector3 (0f,-1f,0f);
+				gameState = GameState.menu;
+				SceneManager.LoadScene ("MainScene");
 			}
 		}
-
-		if (bestPoints < points) {
-			SetBestScore ();
-		}
-	}
-
-	void RestartScene () {
-		SceneManager.LoadScene ("MainScene");
-	}
-
-	void Dead() {
-		deadMenu.SetActive (true);
-	}
-
-	void SetBestScore() {
-		bestPoints = points;
-		bestScore.text = bestPoints.ToString ();
 	}
 }
