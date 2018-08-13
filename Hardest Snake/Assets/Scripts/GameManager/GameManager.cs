@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour {
 	public static int points;
 
 	private bool usserAction;
+	private bool usserQuit;
 	private int bestPoints;
 	private int actualPoints;
 
@@ -40,6 +41,7 @@ public class GameManager : MonoBehaviour {
 
 	void Update () {
 		usserAction = Input.GetKeyDown (KeyCode.Return);
+		usserQuit = Input.GetKeyDown ("q");
 
 		if (points > actualPoints) {
 			actualPoints = points;
@@ -56,6 +58,10 @@ public class GameManager : MonoBehaviour {
 				snake.SetActive (true);
 				DeadSound.SetActive(false);
 				MenuSound.SetActive(true);
+			}
+			if (usserQuit) {
+				Debug.Log ("Quit!");
+				Application.Quit ();
 			}
 		}
 
